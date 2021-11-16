@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+  geolocation-pg:
+    container_name: geolocation-pg
+    image: postgres:12.7
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: places
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./tmp/pgdata:/var/lib/postgresql/data
+
+  geolocation-api:
+    container_name: geolocation-api
+    build: .
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./package.json:/usr/src/app/package.json
+    ports:
+      - 3100:3000
+    links:
+      - geolocation-pg:geolocation-pg
+    depends_on:
+      - geolocation-pg
